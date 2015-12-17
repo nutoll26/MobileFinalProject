@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="www.kookmin.ac.kr.mobilefinalproject.MainActivity">
+
+
+    <TextView
+        android:id="@+id/textLocation"
+        android:text="현재위치 : "
+        android:textSize="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/editLocation"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/textDoing"
+        android:text="뭐하는중 : "
+        android:textSize="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textLocation"
+        android:layout_toLeftOf="@+id/editLocation"
+        android:layout_toStartOf="@+id/editLocation"
+        android:layout_marginTop="19dp" />
+
+    <TextView
+        android:id="@+id/textAccident"
+        android:text="사건사고: "
+        android:textSize="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/editAccident"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <EditText
+        android:id="@+id/editLocation"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/textLocation"
+        android:layout_toEndOf="@+id/textLocation" />
+
+    <EditText
+        android:id="@+id/editDoing"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:layout_alignBottom="@+id/textDoing"
+        android:layout_toRightOf="@+id/textDoing"
+        android:layout_toEndOf="@+id/textDoing" />
+
+    <EditText
+        android:id="@+id/editAccident"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
+        android:layout_below="@+id/editDoing"
+        android:layout_toRightOf="@+id/textAccident"
+        android:layout_toEndOf="@+id/textAccident" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="저장"
+        android:id="@+id/btnSave"
+        android:layout_marginTop="125dp"
+        android:layout_below="@+id/textAccident"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginLeft="54dp"
+        android:layout_marginStart="54dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="지도보기"
+        android:id="@+id/btnMap"
+        android:layout_alignTop="@+id/btnSave"
+        android:layout_alignRight="@+id/editAccident"
+        android:layout_alignEnd="@+id/editAccident" />
+</RelativeLayout>
