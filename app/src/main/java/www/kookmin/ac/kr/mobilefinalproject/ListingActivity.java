@@ -8,9 +8,13 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 
 public class ListingActivity extends AppCompatActivity{
 
@@ -22,6 +26,10 @@ public class ListingActivity extends AppCompatActivity{
 
     SQLiteDatabase db;
     MySQLiteOpenHelper helper;
+
+    ListView listview;
+    ArrayList<String> arrLog = new ArrayList<String>();
+    ArrayAdapter<String> Adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +47,13 @@ public class ListingActivity extends AppCompatActivity{
         doing = intent.getStringExtra("doing");
         accident = intent.getStringExtra("accident");
 
+        listview = (ListView)findViewById(R.id.listv);
+        listview.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
+        Adapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, arrLog);
+
         insert(location, doing, accident);
+        selectAll();
 
         buttonBack = (Button)findViewById(R.id.btnBack);
         buttonBack.setOnClickListener(new View.OnClickListener() {
@@ -57,15 +71,18 @@ public class ListingActivity extends AppCompatActivity{
                 switch (checkedId) {
                     case R.id.radioBtnAll: {
                         //Toast.makeText(ListingActivity.this, "모두", Toast.LENGTH_SHORT).show();
-                        select();
+
                         break;
                     }
                     case R.id.radioBtnAction: {
                         //Toast.makeText(ListingActivity.this, "행동", Toast.LENGTH_SHORT).show();
+
+                        select("코딩",1);
                         break;
                     }
                     case R.id.radioBtnAccident: {
                         //Toast.makeText(ListingActivity.this, "사건", Toast.LENGTH_SHORT).show();
+                        select("춥다",2);
                         break;
                     }
                 }
@@ -86,10 +103,45 @@ public class ListingActivity extends AppCompatActivity{
         db.insert("lifelog", null, values);
     }
 
-    // select
-    public void select() {
-        // 1) db의 데이터를 읽어와서, 2) 결과 저장, 3)해당 데이터를 꺼내 사용
+    public void select(String searchWord, int index) {
+        db = helper.getReadableDatabase();
+        String content = "";
 
+        arrLog.clear();
+        if(index == 0) {
+            Cursor cursor = db.rawQuery("select * from lifelog where Location = '" + searchWord + "'", null);
+            if (cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
+                    content = cursor.getString(1) + ", " + cursor.getString(2) + ", " + cursor.getString(3);
+                    arrLog.add(content);
+
+                    Log.d("db", content);
+                }
+            }
+        }else if(index == 1){
+            Cursor cursor = db.rawQuery("select * from lifelog where Action = '" + searchWord + "'", null);
+            if (cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
+                    content = cursor.getString(1) + ", " + cursor.getString(2) + ", " + cursor.getString(3);
+                    arrLog.add(content);
+                    Log.d("db", content);
+                }
+            }
+        }else if(index == 2){
+            Cursor cursor = db.rawQuery("select * from lifelog where Accident = '" + searchWord + "'", null);
+            if (cursor.getCount() > 0) {
+                while (cursor.moveToNext()) {
+                    content = cursor.getString(1) + ", " + cursor.getString(2) + ", " + cursor.getString(3);
+                    arrLog.add(content);
+                    Log.d("db", content);
+                }
+            }
+        }
+
+        listview.setAdapter(Adapter);
+    }
+    // select
+    public void selectAll() {
         db = helper.getReadableDatabase(); // db객체를 얻어온다. 읽기 전용
         Cursor c = db.query("lifelog", null, null, null, null, null, null);
 
@@ -99,13 +151,21 @@ public class ListingActivity extends AppCompatActivity{
          * selectionArgs, String groupBy, String having, String orderBy)
          */
 
-        while (c.moveToNext()) {
-            String Location = c.getString(c.getColumnIndex("Location"));
-            String Action = c.getString(c.getColumnIndex("Action"));
-            String Accident = c.getString(c.getColumnIndex("Accident"));
+        arrLog.clear();
+        if(c.getCount() > 0) {
+            while (c.moveToNext()) {
+                String Location = c.getString(c.getColumnIndex("Location"));
+                String Action = c.getString(c.getColumnIndex("Action"));
+                String Accident = c.getString(c.getColumnIndex("Accident"));
 
-            Log.i("db", "위치 : " + Location + ", 하는 일 : " + Action + ", 사건 : " + Accident);
+                String content = Location + ", " + Action + ", " + Accident;
+                arrLog.add(content);
+
+                Log.i("db", "위치 : " + Location + ", 하는 일 : " + Action + ", 사건 : " + Accident);
+            }
         }
+
+        listview.setAdapter(Adapter);
     }
 
 }
