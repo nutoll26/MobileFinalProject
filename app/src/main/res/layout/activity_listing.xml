@@ -28,11 +28,18 @@
     <RadioButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="모두"
+        android:id="@+id/radioBtnAll"
+        android:checked="true"
+
+        />
+    <RadioButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="행동"
         android:id="@+id/radioBtnAction"
-        android:checked="true"
-        android:layout_alignBottom="@+id/btnBack"
-        android:layout_centerHorizontal="true" />
+        android:checked="false"
+         />
 
     <RadioButton
         android:layout_width="wrap_content"
@@ -40,7 +47,7 @@
         android:text="사건"
         android:id="@+id/radioBtnAccident"
         android:checked="false"
-        android:layout_toRightOf="@+id/radioBtnAction" />
+        />
 
     </RadioGroup>
 

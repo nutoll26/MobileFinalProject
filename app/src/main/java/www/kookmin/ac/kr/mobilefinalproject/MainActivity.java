@@ -5,20 +5,31 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
+import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity {
 
     Button buttonSave;
     Button buttonMap;
 
+    EditText edLocation;
+    EditText edAction;
+    EditText edAccident;
+
     // GPSTracker class
     private GpsInfo gps;
+
+    double latitude;
+    double longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        edLocation = (EditText)findViewById(R.id.editLocation);
+        edAction = (EditText)findViewById(R.id.editDoing);
+        edAccident = (EditText)findViewById(R.id.editAccident);
 
         buttonSave = (Button)findViewById(R.id.btnSave);
         buttonSave.setOnClickListener(new View.OnClickListener() {
@@ -27,23 +38,21 @@ public class MainActivity extends AppCompatActivity {
                 gps = new GpsInfo(MainActivity.this);
 
                 if (gps.isGetLocation()) {
+                    gps.getLatitude();
+                    gps.getLongitude();
+                    //Toast.makeText(getApplicationContext(), "당신의 위치 - \n위도: " + latitude + "\n경도: " + longitude, Toast.LENGTH_LONG).show();
 
-                    double latitude = gps.getLatitude();
-                    double longitude = gps.getLongitude();
+                    Intent intent = new Intent(MainActivity.this, ListingActivity.class);
+                    intent.putExtra("location", edLocation.getText().toString());
+                    intent.putExtra("latlong", latitude + ", " + longitude);
+                    intent.putExtra("doing", edAction.getText().toString());
+                    intent.putExtra("accident", edAccident.getText().toString());
 
-                    Toast.makeText(getApplicationContext(), "당신의 위치 - \n위도: " + latitude + "\n경도: " + longitude,
-                            Toast.LENGTH_LONG).show();
+                    startActivity(intent);
                 } else {
                     // GPS 를 사용할수 없으므로
                     gps.showSettingsAlert();
                 }
-
-                Intent intent = new Intent(MainActivity.this, ListingActivity.class);
-                intent.putExtra("location", "서울특별시");
-                intent.putExtra("doing", "코딩");
-                intent.putExtra("accident", "나홀로깨어있다");
-
-                startActivity(intent);
             }
         });
 
