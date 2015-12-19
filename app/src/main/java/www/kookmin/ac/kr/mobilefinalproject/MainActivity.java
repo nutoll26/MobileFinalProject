@@ -7,6 +7,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 public class MainActivity extends AppCompatActivity {
 
     Button buttonSave;
@@ -21,6 +24,8 @@ public class MainActivity extends AppCompatActivity {
 
     double latitude;
     double longitude;
+
+    String curTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +47,12 @@ public class MainActivity extends AppCompatActivity {
                     gps.getLongitude();
                     //Toast.makeText(getApplicationContext(), "당신의 위치 - \n위도: " + latitude + "\n경도: " + longitude, Toast.LENGTH_LONG).show();
 
+                    Calendar calendar = Calendar.getInstance();
+                    java.util.Date date = calendar.getTime();
+                    String cur = (new SimpleDateFormat("yyyy.MM.dd-HH:mm:ss").format(date));
+
                     Intent intent = new Intent(MainActivity.this, ListingActivity.class);
+                    intent.putExtra("time", cur);
                     intent.putExtra("location", edLocation.getText().toString());
                     intent.putExtra("latlong", latitude + ", " + longitude);
                     intent.putExtra("doing", edAction.getText().toString());

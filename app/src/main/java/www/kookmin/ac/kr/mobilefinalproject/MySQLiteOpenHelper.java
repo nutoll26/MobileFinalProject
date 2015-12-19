@@ -20,6 +20,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper{
         // SQLiteOpenHelper 가 최초 실행 되었을 때
         String sql = "create table lifelog (" +
                 "Id integer primary key autoincrement, " +
+                "Time text, " +
                 "Location text, " +
                 "Action text, " +
                 "Accident text);";

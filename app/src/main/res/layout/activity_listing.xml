@@ -14,48 +14,70 @@
         android:layout_height="wrap_content"
         android:text="back"
         android:id="@+id/btnBack"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+         />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="내폰"
+        android:id="@+id/btnMyPhone"
+        android:layout_toRightOf="@+id/btnBack"
+        />
+
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="서버"
+        android:id="@+id/btnServer"
+        android:layout_toRightOf="@+id/btnMyPhone"
+        android:layout_toEndOf="@+id/btnMyPhone"
+        />
 
     <RadioGroup
         android:id="@+id/rgroup"
-        android:layout_toRightOf="@+id/btnBack"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_below="@id/btnBack">
 
-    <RadioButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="모두"
-        android:id="@+id/radioBtnAll"
-        android:checked="true"
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="모두"
+            android:id="@+id/radioBtnAll"
+            android:checked="true" />
 
-        />
-    <RadioButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="행동"
-        android:id="@+id/radioBtnAction"
-        android:checked="false"
-         />
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="장소"
+            android:id="@+id/radioBtnLocation"
+            android:checked="false" />
 
-    <RadioButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="사건"
-        android:id="@+id/radioBtnAccident"
-        android:checked="false"
-        />
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="행동"
+            android:id="@+id/radioBtnAction"
+            android:checked="false" />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="사건"
+            android:id="@+id/radioBtnAccident"
+            android:checked="false" />
 
     </RadioGroup>
 
     <ListView
-        android:id="@+id/list"
+        android:id="@+id/listv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/btnBack">
+        android:layout_below="@+id/rgroup">
 
     </ListView>
+
 </RelativeLayout>
