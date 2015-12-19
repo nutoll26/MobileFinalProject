@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -25,8 +26,6 @@ public class MainActivity extends AppCompatActivity {
     double latitude;
     double longitude;
 
-    String curTime;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,7 +44,6 @@ public class MainActivity extends AppCompatActivity {
                 if (gps.isGetLocation()) {
                     gps.getLatitude();
                     gps.getLongitude();
-                    //Toast.makeText(getApplicationContext(), "당신의 위치 - \n위도: " + latitude + "\n경도: " + longitude, Toast.LENGTH_LONG).show();
 
                     Calendar calendar = Calendar.getInstance();
                     java.util.Date date = calendar.getTime();
@@ -70,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
         buttonMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Toast.makeText(MainActivity.this, "위도 : " + latitude + ", 경도 : " + longitude, Toast.LENGTH_SHORT).show();
             }
         });
     }
