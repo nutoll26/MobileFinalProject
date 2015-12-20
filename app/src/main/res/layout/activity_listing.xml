@@ -35,6 +35,15 @@
         android:layout_toEndOf="@+id/btnMyPhone"
         />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="서버지도"
+        android:id="@+id/btnServerMap"
+        android:layout_alignBottom="@+id/btnServer"
+        android:layout_toRightOf="@+id/btnServer"
+        android:layout_toEndOf="@+id/btnServer" />
+
     <RadioGroup
         android:id="@+id/rgroup"
         android:layout_width="fill_parent"

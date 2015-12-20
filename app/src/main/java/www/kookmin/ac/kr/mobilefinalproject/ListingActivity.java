@@ -43,9 +43,11 @@ public class ListingActivity extends AppCompatActivity{
 
     Intent intent;
     String location, doing, accident, curTime;
+    double latitude, longitude;
 
     Button buttonBack;
     Button buttonPhone, buttonServer;
+    Button buttonServerMap;
     RadioGroup rg;
 
     SQLiteDatabase db;
@@ -57,10 +59,12 @@ public class ListingActivity extends AppCompatActivity{
 
     private final String urlPath = "http://ec2-52-192-246-36.ap-northeast-1.compute.amazonaws.com/lifelogging.php";
     String slocation, saction, saccident, stime;
+    double slat, slng;
     String whichWork = "send";
     String curStatus = "phone";
 
-    Vector<String> vc_time = new Vector<String>();
+    Intent mapIntent;
+    String latArr[], lngArr[];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,12 +83,14 @@ public class ListingActivity extends AppCompatActivity{
         doing = intent.getStringExtra("doing");
         accident = intent.getStringExtra("accident");
 
+        latitude = intent.getDoubleExtra("lat", 0);
+        longitude = intent.getDoubleExtra("lng", 0);
+
         listview = (ListView)findViewById(R.id.listv);
-        //listview.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         Adapter = new ArrayAdapter<String>(this, android.R.layout.simple_expandable_list_item_1, arrLog);
         listview.setOnItemClickListener(mItemClickListener);
 
-        insert(curTime, location, doing, accident);
+        insert(curTime, location, doing, accident, latitude, longitude);
 
         selectAll();
 
@@ -115,6 +121,24 @@ public class ListingActivity extends AppCompatActivity{
             }
         });
 
+        buttonServerMap = (Button)findViewById(R.id.btnServerMap);
+        buttonServerMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(curStatus == "server"){
+                    mapIntent = new Intent(ListingActivity.this, MapActivity.class);
+
+                    int size = latArr.length;
+                    mapIntent.putExtra("size", size);
+
+                    for(int i=0; i<size; i++){
+                        mapIntent.putExtra("lat"+i, latArr[i]);
+                        mapIntent.putExtra("lng"+i, lngArr[i]);
+                    }
+                    startActivity(mapIntent);
+                }
+            }
+        });
 
         rg = (RadioGroup)findViewById(R.id.rgroup);
         rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -199,6 +223,47 @@ public class ListingActivity extends AppCompatActivity{
         });
     }
 
+    private AdapterView.OnItemClickListener mItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long l_position) {
+//            // parent는 AdapterView의 속성의 모두 사용 할 수 있다.
+            if(curStatus == "phone") {
+                final String selectItem = (String) parent.getAdapter().getItem(position);
+                final String subSelectItem = selectItem.substring(0, 19);
+
+                Log.d("sub", subSelectItem);
+
+                AlertDialog.Builder alert = new AlertDialog.Builder(ListingActivity.this);
+                alert.setTitle("확인 팝업");
+                alert.setMessage("어떠한 일을 수행하나요?");
+                alert.setPositiveButton("서버 저장", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Toast.makeText(getApplicationContext(), subSelectItem, Toast.LENGTH_SHORT).show();
+                        select(subSelectItem, 10);
+
+                        stime = subSelectItem;
+                        try {
+                            whichWork = "send";
+                            String result = new HttpTask().execute().get();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                        dialog.dismiss();     //닫기
+                    }
+                });
+                alert.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();     //닫기
+                    }
+                });
+                alert.show();
+            }
+        }
+    };
+
     class HttpTask extends AsyncTask<Void, Void, String> {
 
         ProgressDialog asyncDialog = new ProgressDialog(ListingActivity.this);
@@ -215,6 +280,8 @@ public class ListingActivity extends AppCompatActivity{
 
                 switch(whichWork) {
                     case "send":{
+                        String strlat = slat+"";
+                        String strlng = slng+"";
                         nameValue.add(new BasicNameValuePair("CASE", whichWork));
 
                         nameValue.add(new BasicNameValuePair("TIME", stime));
@@ -222,7 +289,10 @@ public class ListingActivity extends AppCompatActivity{
                         nameValue.add(new BasicNameValuePair("ACTION", saction));
                         nameValue.add(new BasicNameValuePair("ACCIDENT", saccident));
 
-                        Log.d("item", whichWork+","+stime+","+slocation+","+saction+","+saccident);
+                        nameValue.add(new BasicNameValuePair("LATITUDE", strlat));
+                        nameValue.add(new BasicNameValuePair("LONGITUDE", strlng));
+
+                        Log.d("item", strlat + ", " + strlng);
                         break;
                     }
                     case "requestAll": {
@@ -295,64 +365,16 @@ public class ListingActivity extends AppCompatActivity{
         }
     }
 
-
-
-
-
-
-
-
-
-    private AdapterView.OnItemClickListener mItemClickListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long l_position) {
-//            // parent는 AdapterView의 속성의 모두 사용 할 수 있다.
-            if(curStatus == "phone") {
-                final String selectItem = (String) parent.getAdapter().getItem(position);
-                final String subSelectItem = selectItem.substring(0, 19);
-
-                Log.d("sub", subSelectItem);
-
-                AlertDialog.Builder alert = new AlertDialog.Builder(ListingActivity.this);
-                alert.setTitle("확인 팝업");
-                alert.setMessage("어떠한 일을 수행하나요?");
-                alert.setPositiveButton("서버 저장", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        //Toast.makeText(getApplicationContext(), subSelectItem, Toast.LENGTH_SHORT).show();
-                        select(subSelectItem, 10);
-
-                        stime = subSelectItem;
-                        try {
-                            whichWork = "send";
-                            String result = new HttpTask().execute().get();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-
-                        dialog.dismiss();     //닫기
-                    }
-                });
-                alert.setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();     //닫기
-                    }
-                });
-                alert.show();
-            }
-        }
-    };
-
     void getResultFromDB(String result){
         try{
             JSONArray jArray = new JSONArray(result);
 
-            String[] jsonName = {"TIME", "LOCATION", "ACTION", "ACCIDENT"};
+            String[] jsonName = {"TIME", "LOCATION", "ACTION", "ACCIDENT", "LATITUDE", "LONGITUDE"};
             String[][] parsedData = new String[jArray.length()][jsonName.length];
             JSONObject json = null;
 
             arrLog.clear();
+
             for(int i=0; i<jArray.length();i++){
                 json = jArray.getJSONObject(i);
                 if(json != null){
@@ -366,23 +388,35 @@ public class ListingActivity extends AppCompatActivity{
                 String content = parsedData[i][0] + "\n" + parsedData[i][1] + ", " + parsedData[i][2] + ", " + parsedData[i][3];
                 arrLog.add(content);
             }
+
+            if(parsedData.length < 5){
+                latArr = new String[parsedData.length];
+                lngArr = new String[parsedData.length];
+
+                for(int i=0; i<parsedData.length; i++){
+                    latArr[i] = parsedData[i][4];
+                    lngArr[i] = parsedData[i][5];
+
+                    Log.i("arr", latArr[i] + ", " + lngArr[i]);
+                }
+            }else{
+                latArr = new String[5];
+                lngArr = new String[5];
+
+                for(int i=0; i<5; i++){
+                    latArr[i] = parsedData[i][4];
+                    lngArr[i] = parsedData[i][5];
+
+                    Log.i("arr", latArr[i] + ", " + lngArr[i]);
+                }
+            }
         }catch(JSONException e){
             e.printStackTrace();
         }
     }
 
-
-
-
-
-
-
-
-
-
-
     // insert
-    public void insert(String time, String location, String doing, String accident) {
+    public void insert(String time, String location, String doing, String accident, double lat, double lng) {
         db = helper.getWritableDatabase(); // db 객체를 얻어온다. 쓰기 가능
 
         ContentValues values = new ContentValues();
@@ -393,9 +427,21 @@ public class ListingActivity extends AppCompatActivity{
         values.put("Action", doing);
         values.put("Accident", accident);
 
+        values.put("Latitude", lat);
+        values.put("Longitude", lng);
+
         db.insert("lifelog", null, values);
     }
 
+//    public void select(){
+//        whichWork = "requestLocation";
+//        try {
+//            String result = new HttpTask().execute().get();
+//            getResultFromDB(result);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
     public void select(String searchWord, int index) {
         db = helper.getReadableDatabase();
         String content = "";
@@ -412,7 +458,6 @@ public class ListingActivity extends AppCompatActivity{
                         //Log.d("db", content);
                     }
                 }
-                listview.setAdapter(Adapter);
             }else if(curStatus.compareTo("server") == 0){
                 whichWork = "requestLocation";
                 try {
@@ -421,9 +466,8 @@ public class ListingActivity extends AppCompatActivity{
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                listview.setAdapter(Adapter);
-
             }
+            listview.setAdapter(Adapter);
         }else if(index == 1){ // 행동 기반 검색
             if(curStatus.compareTo("phone") == 0) {
                 Cursor cursor = db.rawQuery("select * from lifelog where Action = '" + searchWord + "'", null);
@@ -434,7 +478,6 @@ public class ListingActivity extends AppCompatActivity{
                         Log.d("db", content);
                     }
                 }
-                listview.setAdapter(Adapter);
             }else{
                 whichWork = "requestAction";
                 try {
@@ -443,8 +486,8 @@ public class ListingActivity extends AppCompatActivity{
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                listview.setAdapter(Adapter);
             }
+            listview.setAdapter(Adapter);
         }else if(index == 2){ // 사건 기반 검색
             if(curStatus.compareTo("phone") == 0) {
                 Cursor cursor = db.rawQuery("select * from lifelog where Accident = '" + searchWord + "'", null);
@@ -455,7 +498,6 @@ public class ListingActivity extends AppCompatActivity{
                         Log.d("db", content);
                     }
                 }
-                listview.setAdapter(Adapter);
             }else{
                 whichWork = "requestAccident";
                 try {
@@ -464,8 +506,8 @@ public class ListingActivity extends AppCompatActivity{
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                listview.setAdapter(Adapter);
             }
+            listview.setAdapter(Adapter);
         }else if(index == 10){ // 서버에 저장할 데이터 선택
             Cursor cursor = db.rawQuery("select * from lifelog where Time = '" + searchWord + "'", null);
             if (cursor.getCount() > 0) {
@@ -474,7 +516,9 @@ public class ListingActivity extends AppCompatActivity{
                     saction = cursor.getString(3);
                     saccident = cursor.getString(4);
 
-                    Log.d("db", slocation + ", " + saction + ", " + saccident);
+                    slat = cursor.getDouble(5);
+                    slng = cursor.getDouble(6);
+                    Log.d("db10", slat + ", " + slng);
                 }
             }
         }
@@ -494,10 +538,13 @@ public class ListingActivity extends AppCompatActivity{
                     String Action = c.getString(c.getColumnIndex("Action"));
                     String Accident = c.getString(c.getColumnIndex("Accident"));
 
+                    double Latitude = c.getDouble(c.getColumnIndex("Latitude"));
+                    double Longitude = c.getDouble(c.getColumnIndex("Longitude"));
+
                     String content = Time + "\n" + Location + ", " + Action + ", " + Accident;
                     arrLog.add(content);
 
-                    Log.i("db", "시간 : " + Time + ", 위치 : " + Location + ", 하는 일 : " + Action + ", 사건 : " + Accident);
+                    Log.i("dblatlng", Latitude + ", " + Longitude);
                 }
             }
             listview.setAdapter(Adapter);

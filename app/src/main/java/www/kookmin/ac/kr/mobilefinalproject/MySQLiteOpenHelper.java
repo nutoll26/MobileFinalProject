@@ -14,6 +14,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper{
         // TODO Auto-generated constructor stub
     }
 
+    // 핸드폰 디비의 테이블 구성
     @Override
     public void onCreate(SQLiteDatabase db) {
         // TODO Auto-generated method stub
@@ -23,7 +24,9 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper{
                 "Time text, " +
                 "Location text, " +
                 "Action text, " +
-                "Accident text);";
+                "Accident text, " +
+                "Latitude double, " +
+                "Longitude double);";
         db.execSQL(sql);
     }
 
