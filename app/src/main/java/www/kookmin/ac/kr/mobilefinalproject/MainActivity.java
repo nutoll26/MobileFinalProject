@@ -3,10 +3,10 @@ package www.kookmin.ac.kr.mobilefinalproject;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -42,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
                 gps = new GpsInfo(MainActivity.this);
 
                 if (gps.isGetLocation()) {
-                    gps.getLatitude();
-                    gps.getLongitude();
+                    latitude = gps.getLatitude();
+                    longitude = gps.getLongitude();
 
                     Calendar calendar = Calendar.getInstance();
                     java.util.Date date = calendar.getTime();
@@ -52,9 +52,9 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(MainActivity.this, ListingActivity.class);
                     intent.putExtra("time", cur);
                     intent.putExtra("location", edLocation.getText().toString());
-                    intent.putExtra("latlong", latitude + ", " + longitude);
                     intent.putExtra("doing", edAction.getText().toString());
                     intent.putExtra("accident", edAccident.getText().toString());
+                    //intent.putExtra("latlong", latitude + ", " + longitude);
 
                     startActivity(intent);
                 } else {
@@ -68,7 +68,23 @@ public class MainActivity extends AppCompatActivity {
         buttonMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(MainActivity.this, "위도 : " + latitude + ", 경도 : " + longitude, Toast.LENGTH_SHORT).show();
+                gps = new GpsInfo(MainActivity.this);
+
+                if (gps.isGetLocation()) {
+                    latitude = gps.getLatitude();
+                    longitude = gps.getLongitude();
+
+                    Log.d("latlng1", latitude + ", " + longitude);
+
+                    Intent intent = new Intent(MainActivity.this, MapActivity.class);
+                    intent.putExtra("lat", latitude);
+                    intent.putExtra("lng", longitude);
+
+                    startActivity(intent);
+                } else {
+                    // GPS 를 사용할수 없으므로
+                    gps.showSettingsAlert();
+                }
             }
         });
     }
