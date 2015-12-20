@@ -83,6 +83,7 @@ public class ListingActivity extends AppCompatActivity{
         doing = intent.getStringExtra("doing");
         accident = intent.getStringExtra("accident");
 
+        // 위도, 경도
         latitude = intent.getDoubleExtra("lat", 0);
         longitude = intent.getDoubleExtra("lng", 0);
 
@@ -91,14 +92,13 @@ public class ListingActivity extends AppCompatActivity{
         listview.setOnItemClickListener(mItemClickListener);
 
         insert(curTime, location, doing, accident, latitude, longitude);
-
         selectAll();
 
         buttonBack = (Button)findViewById(R.id.btnBack);
         buttonBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Toast.makeText(ListingActivity.this, location + " " + doing + " " + accident, Toast.LENGTH_SHORT).show();
+                // 뒤로 가기
                 finish();
             }
         });
@@ -107,6 +107,7 @@ public class ListingActivity extends AppCompatActivity{
         buttonPhone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // 현재 출력 목록을 핸드폰의 디비에서 가져온다
                 curStatus = "phone";
                 selectAll();
             }
@@ -116,6 +117,7 @@ public class ListingActivity extends AppCompatActivity{
         buttonServer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // 현재 출력 목록을 핸드폰의 서버에서 가져온다
                 curStatus = "server";
                 selectAll();
             }
@@ -131,6 +133,7 @@ public class ListingActivity extends AppCompatActivity{
                     int size = latArr.length;
                     mapIntent.putExtra("size", size);
 
+                    // 지도에 찍힐 마커들의 위도와 경도
                     for(int i=0; i<size; i++){
                         mapIntent.putExtra("lat"+i, latArr[i]);
                         mapIntent.putExtra("lng"+i, lngArr[i]);
@@ -140,6 +143,7 @@ public class ListingActivity extends AppCompatActivity{
             }
         });
 
+        // 라디오 버튼을 클릭하면 검색된 데이터의 리스트가 출력된다.
         rg = (RadioGroup)findViewById(R.id.rgroup);
         rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -165,7 +169,7 @@ public class ListingActivity extends AppCompatActivity{
                                 value.toString();
                                 slocation = value;
                                 Log.d("result", value);
-                                select(value, 0);
+                                select(value, 0); // 디비에서 검색
                             }
                         });
                         alert.show();
@@ -189,7 +193,7 @@ public class ListingActivity extends AppCompatActivity{
                                 value.toString();
                                 saction = value;
                                 Log.d("result", value);
-                                select(value, 1);
+                                select(value, 1); // 디비에서 검색
                             }
                         });
                         alert.show();
@@ -212,10 +216,10 @@ public class ListingActivity extends AppCompatActivity{
                                 value.toString();
                                 saccident = value;
                                 Log.d("result", value);
-                                select(value, 2);
+                                select(value, 2); // 디비에서 검색
                             }
                         });
-                        alert.show();
+                        alert.show(); // 다이얼로그 출
                         break;
                     }
                 }
@@ -244,6 +248,7 @@ public class ListingActivity extends AppCompatActivity{
 
                         stime = subSelectItem;
                         try {
+                            // 서버에 데이터들을 보내고 서버의 디비에 저장한다.
                             whichWork = "send";
                             String result = new HttpTask().execute().get();
                         } catch (Exception e) {
@@ -273,12 +278,12 @@ public class ListingActivity extends AppCompatActivity{
 
         @Override
         protected String doInBackground(Void... voids) {
-
+            // 백그라운드에서 서버와 통신
             try{
                 HttpPost request = new HttpPost(urlPath);
                 Vector<NameValuePair> nameValue = new Vector<NameValuePair>();
 
-                switch(whichWork) {
+                switch(whichWork) { // 통신의 분기에 따라 전송 데이터를 저장한여 서버와 통신한다.
                     case "send":{
                         String strlat = slat+"";
                         String strlng = slng+"";
@@ -356,9 +361,6 @@ public class ListingActivity extends AppCompatActivity{
             return null;
         }
 
-        //asyncTask 3번째 인자와 일치 매개변수값 -> doInBackground 리턴값이 전달됨
-        //AsynoTask 는 preExcute - doInBackground - postExecute 순으로 자동으로 실행됩니다.
-        //ui는 여기서 변경
         protected void onPostExecute(String value){
             asyncDialog.dismiss();
             super.onPostExecute(value);
@@ -384,11 +386,13 @@ public class ListingActivity extends AppCompatActivity{
                 }
             }
 
+            // 서버에서 보내준 값의 결과를 리스트 어댑터에 저장한다.
             for(int i=0; i<parsedData.length; i++){
                 String content = parsedData[i][0] + "\n" + parsedData[i][1] + ", " + parsedData[i][2] + ", " + parsedData[i][3];
                 arrLog.add(content);
             }
 
+            // 지도에 표시할 마커의 위도와 경도를 최대 5개만 저장한다.
             if(parsedData.length < 5){
                 latArr = new String[parsedData.length];
                 lngArr = new String[parsedData.length];
@@ -433,15 +437,6 @@ public class ListingActivity extends AppCompatActivity{
         db.insert("lifelog", null, values);
     }
 
-//    public void select(){
-//        whichWork = "requestLocation";
-//        try {
-//            String result = new HttpTask().execute().get();
-//            getResultFromDB(result);
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
     public void select(String searchWord, int index) {
         db = helper.getReadableDatabase();
         String content = "";
@@ -454,8 +449,6 @@ public class ListingActivity extends AppCompatActivity{
                     while (cursor.moveToNext()) {
                         content = cursor.getString(1) + "\n" + cursor.getString(2) + ", " + cursor.getString(3) + ", " + cursor.getString(4);
                         arrLog.add(content);
-
-                        //Log.d("db", content);
                     }
                 }
             }else if(curStatus.compareTo("server") == 0){
@@ -495,7 +488,6 @@ public class ListingActivity extends AppCompatActivity{
                     while (cursor.moveToNext()) {
                         content = cursor.getString(1) + "\n" + cursor.getString(2) + ", " + cursor.getString(3) + ", " + cursor.getString(4);
                         arrLog.add(content);
-                        Log.d("db", content);
                     }
                 }
             }else{
@@ -508,7 +500,7 @@ public class ListingActivity extends AppCompatActivity{
                 }
             }
             listview.setAdapter(Adapter);
-        }else if(index == 10){ // 서버에 저장할 데이터 선택
+        }else if(index == 10){ // 서버에 저장할 데이터 선택, 검색 데이터 출력이 아니다.
             Cursor cursor = db.rawQuery("select * from lifelog where Time = '" + searchWord + "'", null);
             if (cursor.getCount() > 0) {
                 while (cursor.moveToNext()) {
@@ -518,11 +510,11 @@ public class ListingActivity extends AppCompatActivity{
 
                     slat = cursor.getDouble(5);
                     slng = cursor.getDouble(6);
-                    Log.d("db10", slat + ", " + slng);
                 }
             }
         }
     }
+
     // select
     public void selectAll() {
 
@@ -532,7 +524,7 @@ public class ListingActivity extends AppCompatActivity{
 
             arrLog.clear();
             if (c.getCount() > 0) {
-                while (c.moveToNext()) {
+                while (c.moveToNext()) { // 로컬 디비에서 검색된 행의 갯수만큼 실행
                     String Time = c.getString(c.getColumnIndex("Time"));
                     String Location = c.getString(c.getColumnIndex("Location"));
                     String Action = c.getString(c.getColumnIndex("Action"));
@@ -541,6 +533,7 @@ public class ListingActivity extends AppCompatActivity{
                     double Latitude = c.getDouble(c.getColumnIndex("Latitude"));
                     double Longitude = c.getDouble(c.getColumnIndex("Longitude"));
 
+                    // 리스트 뷰 어탭터에 저장한다.
                     String content = Time + "\n" + Location + ", " + Action + ", " + Accident;
                     arrLog.add(content);
 

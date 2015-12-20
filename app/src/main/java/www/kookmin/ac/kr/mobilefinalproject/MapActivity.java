@@ -43,10 +43,8 @@ public class MapActivity extends AppCompatActivity {
 
         for(int i=0; i<size; i++) {
             whereMe[i] = new LatLng(lat[i], lng[i]);
-            Marker seoul = map.addMarker(new MarkerOptions().position(whereMe[i]).title("현재위치"+(i+i)));
+            Marker seoul = map.addMarker(new MarkerOptions().position(whereMe[i]).title("현재위치"+(i+1)));
 
-//        whereMe2 = new LatLng(38, 128);
-//        Marker seoul2 = map.addMarker(new MarkerOptions().position(whereMe2).title("현재위치2"));
         }
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(whereMe[0], 15));
         map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);

@@ -80,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
                     longitude = gps.getLongitude();
 
                     Intent intent = new Intent(MainActivity.this, MapActivity.class);
+                    
                     intent.putExtra("size", 1);
                     intent.putExtra("lat0", latitude+"");
                     intent.putExtra("lng0", longitude+"");
